@@ -1,6 +1,6 @@
 
 ############## START SETUP
-prj_path <- agvise::setup_project("RWARAB", "agworkflows")
+prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
 ### get the data
