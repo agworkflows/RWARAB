@@ -18,12 +18,9 @@ project <- "RWA_potato"
 #must have this line 
 prj_path <- file.path(rootdir, project)
 
+#make sure required packages are installed
+agvise::install_pkgs(c("geodata", "randomForest"))
+
 #set the default geodata path
 geodata::geodata_path(geodata_dir)
-
-#get the last version of agvise 
-remotes::install_github("reagro/agvise", quiet=TRUE)
-
-#make sure required packages are installed
-agvise::install_pkgs(c("randomForest"))
 
