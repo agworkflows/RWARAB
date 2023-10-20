@@ -1,14 +1,7 @@
-############## START SETUP
-if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") { 
-	rootdir <- "d:/agwise"
-} else { 
-	# cglabs
-	rootdir <- "~/agwise"
-}
-project <- "RWARAB"
-################ SETUP END
 
-prj_path <- file.path(rootdir, project)
+############## START SETUP
+prj_path <- agvise::setup_project("RWARAB", "agworkflows")
+################ SETUP END
 
 
 #downloading the data

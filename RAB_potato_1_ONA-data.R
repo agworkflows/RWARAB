@@ -1,14 +1,7 @@
-############## START SETUP
-if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") { 
-	rootdir <- "d:/agwise"
-} else { 
-	# cglabs
-	rootdir <- "~/agwise"
-}
-project <- "RWARAB"
-prj_path <- file.path(rootdir, project)
-################ SETUP END
 
+############## START SETUP
+prj_path <- agvise::setup_project("RWARAB", "agworkflows")
+################ SETUP END
 
 fraw <- file.path(uc_path, "raw/SAnDMan.RDS")
 if (!file.exists(fraw)) {
