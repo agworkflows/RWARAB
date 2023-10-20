@@ -6,7 +6,7 @@ if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") {
 	# cglabs
 	rootdir <- "~/agwise"
 }
-project <- "RWARAB"
+project <- "RWA_potato"
 
 ### do not edit
 prj_path <- file.path(rootdir, project)
