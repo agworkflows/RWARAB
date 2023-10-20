@@ -1,9 +1,9 @@
 
 ############## START SETUP
-prj_path <- agvise::setup_project("RWARAB", "agworkflows")
+prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
-fraw <- file.path(uc_path, "raw/SAnDMan.RDS")
+fraw <- file.path(prj_path, "raw/SAnDMan.RDS")
 if (!file.exists(fraw)) {
 	# pwds <- "D:/workspace/SAnDMan/pws.txt"
 	creds <- scan(pwds, what = "character")
@@ -53,6 +53,6 @@ ds1 <- pd[[3]] |> #plot level data
   left_join(af) |>
   left_join(at)
 
-outfile <- file.path(uc_path, "intermediate/SAnDMan_potato_fieldData.RDS"))
+outfile <- file.path(prj_path, "intermediate/SAnDMan_potato_fieldData.RDS"))
 saveRDS(ds1, outfile)
 
