@@ -42,13 +42,14 @@ dev.off()
 rwshp0 <- geodata::gadm("RWA", level=0) |> sf::st_as_sf()
 rwshp1 <- geodata::gadm("RWA", level=1) |> sf::st_as_sf()
 rwshp2 <- geodata::gadm("RWA", level=2) |> sf::st_as_sf()
-rwshp3 <- geodata::gadm("RWA", level=3) |> sf::st_as_sf()
-rwshp4 <- geodata::gadm("RWA", level=4) |> sf::st_as_sf()
+#rwshp3 <- geodata::gadm("RWA", level=3) |> sf::st_as_sf()
+#rwshp4 <- geodata::gadm("RWA", level=4) |> sf::st_as_sf()
 
-rwlake <- sf::st_read(file.path(prj_path, "data/raw/spatial/RWA_Lakes_NISR.shp"))
-rwAEZ <- sf::st_read(file.path(prj_path,"data/raw/spatial/AEZ_DEM_Dissolve.shp"))
+rwlake <- sf::st_as_sf(terra::vect(file.path(prj_path, "data/raw/spatial/RWA_Lakes_NISR.shp")))
+rwAEZ <- sf::st_as_sf(terra::vect(file.path(prj_path,"data/raw/spatial/AEZ_DEM_Dissolve.shp")))
 rwAEZ <- rwAEZ[rwAEZ$Names_AEZs %in% c("Birunga", "Congo-Nile watershed divide", "Buberuka highlands"),]
 
+provs <- c("Amajyaruguru", "Amajyepfo", "Iburengerazuba")
 
 png(file.path(prj_path, "img/explore_trial_locations.png"))
 
@@ -57,10 +58,10 @@ png(file.path(prj_path, "img/explore_trial_locations.png"))
 	  geom_sf(data = rwAEZ, aes(fill = Names_AEZs)) +
 	  geom_sf(data = rwlake, size=NA, fill="lightblue")+
 	  #geom_sf(data = rwshp3[rwshp3$ADM1_EN %in% c("Northern Province", "Western Province", "Southern Province"),], linewidth = 0.2, color = "white", fill=NA) + 
-	  geom_sf(data = rwshp2[rwshp2$ADM1_EN %in% c("Northern Province", "Western Province", "Southern Province"),], linewidth = 0.6, color = "grey", fill=NA) +
+	  geom_sf(data = rwshp2, linewidth = 0.6, color = "grey", fill=NA) +
 	  geom_sf(data = rwshp1, linewidth = 0.8, color = "black", fill=NA) + 
 	  geom_sf(data = rwshp0, linewidth = 1.2, color = "black", fill=NA) + 
-	  geom_sf_text(data = rwshp2[rwshp2$ADM1_EN %in% c("Northern Province", "Western Province", "Southern Province"),], aes(label = ADM2_EN))+
+	  geom_sf_text(data = rwshp2[rwshp2$NAME_1 %in% provs,], aes(label = NAME_2))+
 	  geom_point(data = ds, aes(x=as.numeric(lon), y=as.numeric(lat), shape = expCode, colour = expCode, size = expCode))+
 	  scale_shape_manual(values = c(15, 16, 18))+
 	  scale_size_manual(values = c(3,3,4))+
