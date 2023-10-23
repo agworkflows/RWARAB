@@ -3,14 +3,14 @@
 ## add a rootdir for each computer that is used
 if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") { 
 	rootdir <- "d:/agwise"
-	geodata_dir <- rootdir
+	geodata_dir <- file.path(rootdir, "geodata")
 } else if (system('hostname', TRUE) == "XYZ") { 
 	rootdir <- "c:/workspace/agwise"
-	geodata_dir <- rootdir
+	geodata_dir <- file.path(rootdir, "geodata")
 } else { 
 	# cglabs
 	rootdir <- "~/agwise"
-	geodata_dir <- rootdir
+	geodata_dir <- file.path(rootdir, "geodata")
 }
 
 project <- "RWA_potato"

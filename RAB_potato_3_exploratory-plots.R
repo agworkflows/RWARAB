@@ -1,13 +1,15 @@
+
 ############## START SETUP
 prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
-ds <- readRDS("prj_path/data/intermediate/compiled_potato_fertiliser_trial_data.RDS")
+ds <- readRDS(file.path(prj_path, "/data/intermediate/compiled_potato_fertiliser_trial_data.RDS"))
+
+library(ggplot2)
 
 png(file.path(prj_path, "img/explore_yield_range.png"))
-
 	#plot showing yield ranges by experiment and season:
-	ds %>%
+	ds |>
 	  ggplot(aes(x = season, y = TY)) +
 	  geom_boxplot() +
 	  facet_wrap(~expCode, scales="free_y", ncol=1) +
@@ -23,10 +25,9 @@ dev.off()
 #plot showing variation in yield as affected by NPK rate by experiment and season:
 
 png(file.path(prj_path, "img/explore_yield_npk.png"))
-
-	ds %>%
-	  gather(nutrient, rate, N:K) %>%
-	  mutate(nutrient = factor(nutrient, levels=c("N", "P", "K"))) %>%
+	ds |>
+	  tidyr::gather(nutrient, rate, N:K) |>
+	  dplyr::mutate(nutrient = factor(nutrient, levels=c("N", "P", "K"))) |>
 	  ggplot(aes(rate, TY)) + 
 	  geom_point(alpha=.33, shape=16) +
 	  facet_grid(nutrient ~ expCode+season) + 
@@ -35,18 +36,17 @@ png(file.path(prj_path, "img/explore_yield_npk.png"))
 	  theme(axis.title = element_text(size = 15, face="bold"),
 			axis.text = element_text(size = 14),
 			strip.text = element_text(size = 14, face="bold"))
-
 dev.off()
 
 #map with trial locations:
-rwashp0 <- sgeodata::gadm("RWA", level=0) |> sf::st_as_sf()
-rwashp1 <- geodata::gadm("RWA", level=1) |> sf::st_as_sf()
-rwashp2 <- geodata::gadm("RWA", level=2) |> sf::st_as_sf()
-rwashp3 <- geodata::gadm("RWA", level=3) |> sf::st_as_sf()
-rwashp4 <- geodata::gadm("RWA", level=4) |> sf::st_as_sf()
+rwshp0 <- geodata::gadm("RWA", level=0) |> sf::st_as_sf()
+rwshp1 <- geodata::gadm("RWA", level=1) |> sf::st_as_sf()
+rwshp2 <- geodata::gadm("RWA", level=2) |> sf::st_as_sf()
+rwshp3 <- geodata::gadm("RWA", level=3) |> sf::st_as_sf()
+rwshp4 <- geodata::gadm("RWA", level=4) |> sf::st_as_sf()
 
-rwlake <- sf::st_read("data/raw/spatial/RWA_Lakes_NISR.shp")
-rwAEZ <- sf::st_read("data/raw/spatial/AEZ_DEM_Dissolve.shp")
+rwlake <- sf::st_read(file.path(prj_path, "data/raw/spatial/RWA_Lakes_NISR.shp"))
+rwAEZ <- sf::st_read(file.path(prj_path,"data/raw/spatial/AEZ_DEM_Dissolve.shp"))
 rwAEZ <- rwAEZ[rwAEZ$Names_AEZs %in% c("Birunga", "Congo-Nile watershed divide", "Buberuka highlands"),]
 
 
