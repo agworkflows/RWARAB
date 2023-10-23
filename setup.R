@@ -20,7 +20,7 @@ project <- "RWA_potato"
 prj_path <- file.path(rootdir, project)
 
 #make sure required packages are installed
-agvise::install_pkgs(c("geodata", "randomForest"))
+agvise::install_pkgs(c("geodata", "randomForest", "lme4", "dplyr"))
 
 #set the default geodata path
 geodata::geodata_path(geodata_dir)
