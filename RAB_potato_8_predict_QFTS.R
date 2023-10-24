@@ -3,7 +3,7 @@ prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
 INS <- readRDS(file.path(prj_path, "data/intermediate/INS.RDS"))
-ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blub.RDS"))
+ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
 
 
 #################################################

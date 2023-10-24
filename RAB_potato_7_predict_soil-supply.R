@@ -7,6 +7,8 @@ prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 # 6. Predict indigenous nutrient supply from soil data #
 ########################################################
 
+ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
+
 supply <- readRDS(file.path(prj_path, "data/intermediate/compiled_potato_fertiliser_trial_calculated_supply_afterlmer_sqrttf.RDS"))
 
 sdt <- readRDS(file.path(prj_path, "data/intermediate/Soil_PointData_trial.RDS"))
@@ -42,6 +44,9 @@ ds_ref <- ds |>
   dplyr::group_by(expCode, TLID) |>
   dplyr::summarise(refY = median(TY)) |>
   dplyr::mutate(refY = cut(refY, c(-Inf, 10, 20, 30, 40, Inf), labels = c("Very low", "Low", "Medium", "High", "Very high")))
+
+saveRDS(ds_ref, file.path(prj_path, "data/intermediate/ds_ref.RDS"))
+
 
 #Topography and EAZ data:
 tdt <- tdt |>

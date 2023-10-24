@@ -33,4 +33,4 @@ fit2 <- update(fit1, . ~ . +(0 + N100|TLID) +(0 + P100|TLID) +(0 + K100|TLID))
 
 ds$blup <- predict(fit2, ds)**2
 
-saveRDS(ds, file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blub.RDS"))
+saveRDS(ds, file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))

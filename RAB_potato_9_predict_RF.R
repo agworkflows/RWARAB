@@ -2,12 +2,22 @@
 prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
-ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blub.RDS"))
 
 ############################################################################################
 # 8. Alternative approach: Predict yield directly with Random Forest a la Jordan & Camilla #
 ############################################################################################
 
+
+ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
+ds_ef <- readRDS(file.path(prj_path, "/data/intermediate/ds_ref.RDS"))
+
+sdt <- readRDS(file.path(prj_path, "data/intermediate/Soil_PointData_trial.RDS"))
+
+#sdt2 <- readRDS(file.path(prj_path, "data/intermediate/compiled_potato_fertiliser_trial_soildata.RDS"))
+tdt <- readRDS(file.path(prj_path, "data/intermediate/Topography_AEZ_trial.RDS"))
+
+colnames(sdt)[colnames(sdt) == "ID"] <- "TLID"
+colnames(tdt)[colnames(tdt) == "ID"] <- "TLID"
 
 #Prepare dataset...
 dsp <- ds |>
@@ -21,9 +31,9 @@ dsp <- ds |>
   dplyr::ungroup() |>
   dplyr::filter(treat != "ref") |>
   dplyr::select(-treat, -Y, -refY) |>
-  dplyr::join(sdt) |>
-  dplyr::join(ds_ref) |>
-  dplyr::join(tdt) |>
+  plyr::join(sdt, by="TLID") |>
+  plyr::join(ds_ref, by="TLID") |>
+  plyr::join(tdt, by="TLID") |>
   na.omit()
 
 #First model that includes district and refY
@@ -36,10 +46,9 @@ RF1 <- randomForest::randomForest(dY ~ ., subset(dsp, select=-c(TLID, expCode, r
 sqrt(RF1$mse[length(RF1$mse)])
 RF1
 
-predRFs <- NULL
-
 #Obtain yield estimates using LOOCV:
-for(i in unique(dsp$TLID)){
+
+predRFs <- lapply(unique(dsp$TLID), function(i) {
   
   dsp_train <- subset(dsp[dsp$TLID != i,], select = -c(TLID, expCode))
   dsp_valid <- subset(dsp[dsp$TLID == i,], select = -c(TLID, expCode))
@@ -50,15 +59,15 @@ for(i in unique(dsp$TLID)){
   RF0 <- ranger::ranger(formula = dY ~ ., data = dsp_train, num.trees = 200) 
   RF1 <- ranger::ranger(formula = dY ~ ., data = subset(dsp_train, select = -c(district, refY)), num.trees = 200) 
 
-  predRFs <- rbind(predRFs, data.frame(TLID = i,
-                                       subset(dsp_valid, select=c(N, P, K, dY)),
-                                       #dYp0 = predict(RF0, dsp_valid),
-                                       #dYp1 = predict(RF1, dsp_valid)
-                                       dYp0 = predict(RF0, dsp_valid)$predictions,
-                                       dYp1 = predict(RF1, dsp_valid)$predictions
-                                       ))
-  
-}
+  data.frame(TLID = i,
+            subset(dsp_valid, select=c(N, P, K, dY)),
+            #dYp0 = predict(RF0, dsp_valid),
+            #dYp1 = predict(RF1, dsp_valid)
+            dYp0 = predict(RF0, dsp_valid)$predictions,
+            dYp1 = predict(RF1, dsp_valid)$predictions)
+})
+
+predRFs <- do.call(rbind, predRFs)
 
 predRFsl <- predRFs |>
   dplyr::gather(variable, value, dYp0:dYp1) |>

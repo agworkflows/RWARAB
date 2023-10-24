@@ -31,12 +31,11 @@ af <- ad[[1]] |>
 
 #get the trial identifiers
 at <- ad[[3]] |>
-  join(ad[[1]] |> dplyr::select(L1, entity, season, plantingDate, expCode)) |>
-  filter(grepl("TL", entity),
-         L2 == "trial") |>
+  plyr::join(ad[[1]] |> dplyr::select(L1, entity, season, plantingDate, expCode)) |>
+  dplyr::filter(grepl("TL", entity), L2 == "trial") |>
   dplyr::select(TLID2_new, TL_name_new, season, plantingDate, expCode) |>
-  mutate(plantingDate = as.Date(plantingDate, format="%Y-%m-%d")) |>
-  rename(TLID2 = TLID2_new,
+  dplyr::mutate(plantingDate = as.Date(plantingDate, format="%Y-%m-%d")) |>
+  dplyr::rename(TLID2 = TLID2_new,
          TL_name = TL_name_new)
 
 #download and decompose the potato plot level data:
