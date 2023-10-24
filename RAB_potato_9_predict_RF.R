@@ -2,132 +2,7 @@
 prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
 ################ SETUP END
 
-INS <- readRDS(file.path(prj_path, "data/intermediate/INS.RDS"))
-
-#################################################
-# 7. Predict yield and compare different models #
-#################################################
-
-py <- NULL
-
-for(i in unique(INS$TLID)){
-
-  
-  dsi <- ds[ds$TLID == i,]
-  fri <- data.frame("N" = dsi$N,
-                    "P" = dsi$P,
-                    "K" = dsi$K)
-  
-  #different supply estimates:
-  sqi <- INS[INS$TLID == i, c("N_base_supply", "P_base_supply", "K_base_supply")]
-  spi <- INS[INS$TLID == i, c("N_pred", "P_pred", "K_pred")]
-  sni <- INS |> dplyr::select(N_base_supply, P_base_supply, K_base_supply) |> 
-    dplyr::summarise(across(everything(), list(median)))
-  
-  ayi <- as.numeric(INS[INS$TLID == i,]$refY) * 10 * 1000 * 0.21
-  
-  #yield predicted using reverse Quefts calculated supply
-  yqi <- runQUEFTS(nut_rates = fri,
-                   supply = as.numeric(sqi),
-                   crop = "Potato",
-                   Ya = ayi,
-                   SeasonLength = 120)
-  
-  #yield predicted using supply obtained from predictions by RF
-  ypi <- runQUEFTS(nut_rates = fri,
-                   supply = as.numeric(spi),
-                   crop = "Potato",
-                   Ya = ayi,
-                   SeasonLength = 120)
-  
-  #yield predicted by a naive model using median values of NPK supply across all TLIDs:
-  yni <- runQUEFTS(nut_rates = fri,
-                   supply = as.numeric(sni),
-                   crop = "Potato",
-                   Ya = ayi,
-                   SeasonLength = 120)
-  
-  py <- rbind(py, data.frame(TLID = i,
-                             N = fri$N,
-                             P = fri$P,
-                             K = fri$K,
-                             Yq = yqi / 1000 / 0.21, #yield predicted using revQUEFTS supply
-                             Yp = ypi / 1000 / 0.21, #yield predicted using RF predicted supply
-                             Yn = yni / 1000 / 0.21, #yield predicted using median nutrient supply
-                             Yb = dsi$blup,          #yield blup
-                             Yo = dsi$TY))           #yield observed
-}
-
-
-py |> left_join(ds |> dplyr::select(TLID, expCode, season) |> unique()) |>
-  #filter(Nlim == "limiting", Plim == "non-limiting" & Klim == "non-limiting") |>
-  mutate(refY = ifelse(N > 75 & P > 30 & K > 50, "Reference treatment", "Other treatments")) |>
-  ggplot(aes(x = Yp, y = Yb)) + 
-  geom_point(alpha = .33, shape = 16) + 
-  geom_abline(slope= 1, intercept = 0) + 
-  #stat_poly_line(se = F) +
-  #stat_poly_eq(aes(label = after_stat(eq.label)), size=6) +
-  #stat_poly_eq(label.y = 0.9, size = 6) +
-  #facet_wrap(~refY) +
-  ggpmisc::stat_poly_line(formula = y ~ x, se = F) +
-  ggpmisc::stat_poly_eq(use_label(c("eq", "R2")),
-                        formula = y ~ x, size = 6) +
-
-  #facet_wrap(~expCode+season, ncol=3) + 
-  xlab("\nPredicted tuber yield (t/ha)")+
-  ylab("BLUP potato tuber yield (t/ha)\n")+
-  xlim(0, 62.5)+
-  ylim(0, 62.5)+
-  theme_gray()+
-  theme(axis.title = element_text(size = 14, face="bold"),
-        axis.text = element_text(size = 14),
-        strip.text = element_text(size = 14, face="bold"))
-  
-
-pyr <- py |>
-  gather(variable, value, Yq:Yo) |>
-  group_by(TLID, N, P, K, variable) |>
-  summarise(value = mean(value)) |>
-  mutate(treat = ifelse(N>75 & P>30 & K>50, "ref", "other")) |>
-  group_by(TLID, variable) |>
-  mutate(refY = mean(ifelse(treat == "ref", value, NA), na.rm=TRUE),
-         dY = refY - value) |>
-  filter(treat != "ref") |>
-  dplyr::select(-treat, -value, -refY) |>
-  spread(variable, dY) |>
-  gather(variable, value, c(Yq, Yp, Yo, Yn)) |>
-  mutate(variable = mapvalues(variable, 
-                              from = c("Yq", "Yp", "Yn"),
-                              to = c("supply from reverse QUEFTS", "supply by RF prediction", "simple medians for supply"))) |>
-  ungroup()
-
-
-pyr |>
-  filter(variable != "Yo") |>
-  #filter(Nlim == "limiting", Plim == "non-limiting" & Klim == "non-limiting") |>
-  mutate(variable = as.character(variable)) |>
-  ggplot(aes(x = value, y = Yb)) + 
-  geom_point(alpha=.33, shape=16) +
-  facet_wrap(~variable) +
-  geom_text(data = pyr |> 
-              filter(variable != "Yo") |> 
-              group_by(variable) |> 
-              summarise(rmse = sqrt(sum((value - Yb)**2)/n()),
-                        value = -1,
-                        Yb = 20),
-            aes(label = paste0("rmse = ", round(rmse*100)/100)),
-            size = 6, hjust = 0) +
-  xlab("\nPredicted potato tuber yield difference to reference treatment [t/ha]") +
-  ylab("BLUP potato tuber yield difference to reference treatment [t/ha]\n") +
-  geom_abline(intercept = 0, slope = 1) +
-  ggpmisc::stat_poly_line(formula = y ~ x, se = F) +
-  ggpmisc::stat_poly_eq(use_label(c("eq")),
-                        formula = y ~ x, size = 6) +
-  theme_gray()+
-  theme(axis.title = element_text(size = 14, face="bold"),
-        axis.text = element_text(size = 14),
-        strip.text = element_text(size = 14, face="bold"))
-
+ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blub.RDS"))
 
 ############################################################################################
 # 8. Alternative approach: Predict yield directly with Random Forest a la Jordan & Camilla #
@@ -136,28 +11,28 @@ pyr |>
 
 #Prepare dataset...
 dsp <- ds |>
-  mutate(Y = blup) |>
-  group_by(TLID, N, P, K) |>
-  summarise(Y = mean(Y)) |>
-  mutate(treat = ifelse(N>75 & P>30 & K>50, "ref", "other")) |>
-  group_by(TLID) |>
-  mutate(refY = mean(ifelse(treat == "ref", Y, NA), na.rm=TRUE),
+  dplyr::mutate(Y = blup) |>
+  dplyr::group_by(TLID, N, P, K) |>
+  dplyr::summarise(Y = mean(Y)) |>
+  dplyr::mutate(treat = ifelse(N>75 & P>30 & K>50, "ref", "other")) |>
+  dplyr::group_by(TLID) |>
+  dplyr::mutate(refY = mean(ifelse(treat == "ref", Y, NA), na.rm=TRUE),
          dY = refY - Y) |>
-  ungroup() |>
-  filter(treat != "ref") |>
+  dplyr::ungroup() |>
+  dplyr::filter(treat != "ref") |>
   dplyr::select(-treat, -Y, -refY) |>
-  join(sdt) |>
-  join(ds_ref) |>
-  join(tdt) |>
+  dplyr::join(sdt) |>
+  dplyr::join(ds_ref) |>
+  dplyr::join(tdt) |>
   na.omit()
 
 #First model that includes district and refY
-RF0 <- randomForest(dY ~ ., subset(dsp, select=-c(TLID, expCode)), importance=TRUE, ntree=200)
+RF0 <- randomForest::randomForest(dY ~ ., subset(dsp, select=-c(TLID, expCode)), importance=TRUE, ntree=200)
 sqrt(RF0$mse[length(RF0$mse)])
 RF0
 
 #Simpler model without district and refY
-RF1 <- randomForest(dY ~ ., subset(dsp, select=-c(TLID, expCode, refY, district)), importance=TRUE, ntree=200)
+RF1 <- randomForest::randomForest(dY ~ ., subset(dsp, select=-c(TLID, expCode, refY, district)), importance=TRUE, ntree=200)
 sqrt(RF1$mse[length(RF1$mse)])
 RF1
 
@@ -172,8 +47,8 @@ for(i in unique(dsp$TLID)){
   #RF0 <- randomForest(dY ~ ., dsp_train, ntree=500)
   #RF1 <- randomForest(dY ~ ., subset(dsp_train, select = -c(district, refY)), ntree=500)
   
-  RF0 <- ranger(formula = dY ~ ., data = dsp_train, num.trees = 200) 
-  RF1 <- ranger(formula = dY ~ ., data = subset(dsp_train, select = -c(district, refY)), num.trees = 200) 
+  RF0 <- ranger::ranger(formula = dY ~ ., data = dsp_train, num.trees = 200) 
+  RF1 <- ranger::ranger(formula = dY ~ ., data = subset(dsp_train, select = -c(district, refY)), num.trees = 200) 
 
   predRFs <- rbind(predRFs, data.frame(TLID = i,
                                        subset(dsp_valid, select=c(N, P, K, dY)),
@@ -186,8 +61,8 @@ for(i in unique(dsp$TLID)){
 }
 
 predRFsl <- predRFs |>
-  gather(variable, value, dYp0:dYp1) |>
-  mutate(variable = mapvalues(variable, from = c("dYp0", "dYp1"), to = c("With refY", "without refY")))
+  dplyr::gather(variable, value, dYp0:dYp1) |>
+  dplyr::mutate(variable = mapvalues(variable, from = c("dYp0", "dYp1"), to = c("With refY", "without refY")))
 
 #Visualize yield effects
 ggplot(predRFsl, aes(x = value, y = dY)) + 
