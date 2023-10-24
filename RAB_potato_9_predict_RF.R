@@ -62,7 +62,7 @@ for(i in unique(dsp$TLID)){
 
 predRFsl <- predRFs |>
   dplyr::gather(variable, value, dYp0:dYp1) |>
-  dplyr::mutate(variable = mapvalues(variable, from = c("dYp0", "dYp1"), to = c("With refY", "without refY")))
+  dplyr::mutate(variable = plyr::mapvalues(variable, from = c("dYp0", "dYp1"), to = c("With refY", "without refY")))
 
 #Visualize yield effects
 ggplot(predRFsl, aes(x = value, y = dY)) + 
@@ -79,7 +79,7 @@ ggplot(predRFsl, aes(x = value, y = dY)) +
   ylab("BLUP potato tuber yield difference to reference treatment [t/ha]\n") +
   geom_abline(intercept = 0, slope = 1) +
   ggpmisc::stat_poly_line(formula = y ~ x, se = F) +
-  ggpmisc::stat_poly_eq(use_label(c("eq")),
+  ggpmisc::stat_poly_eq(ggpmisc::use_label(c("eq")),
                         formula = y ~ x, size = 6) +
   theme_gray()+
   theme(axis.title = element_text(size = 14, face="bold"),
