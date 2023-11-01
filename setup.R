@@ -21,7 +21,7 @@ prj_path <- file.path(rootdir, project)
 
 #make sure required packages are installed
 agvise::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
-agvise::install_pkgs(c("Rquefts", update=TRUE)
+agvise::install_pkgs("Rquefts", update=TRUE)
 
 #set the default geodata path
 geodata::geodata_path(geodata_dir)
