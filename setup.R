@@ -13,17 +13,16 @@ if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") {
 	geodata_dir <- rootdir
 }
 
-
 project <- "RWA_potato"
 
 #must have this line 
 prj_path <- file.path(rootdir, project)
 
 #make sure required packages are installed
-agvise::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
-agvise::install_pkgs("Rquefts", update=TRUE)
+workflow::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
+workflow::install_pkgs("Rquefts", update=TRUE)
 
 #set the default geodata path
-geodata::geodata_path(geodata_dir)
+#geodata::geodata_path(geodata_dir)
 
 

@@ -1,6 +1,6 @@
-############## START SETUP
-prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
-################ SETUP END
+### SETUP
+prj_path <- wow::init("RWA_potato", "agworkflows")
+
 
 
 ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
@@ -17,7 +17,7 @@ base_plot <- function() {
 
 library(ggplot2)
 
-png(file.path(prj_path, "img/blub_vs_raw.png"))
+png(file.path(prj_path, "img/5_blub_vs_raw.png"))
 
 	ggplot(ds, aes(x = blup, y = TY)) + 
 	  geom_point(alpha=.33, shape=16) +
@@ -34,7 +34,7 @@ png(file.path(prj_path, "img/blub_vs_raw.png"))
 dev.off()
 
 #plot illustrating that the elimination of random error results in more meaningful structure in yield response:
-png(file.path(prj_path, "img/blub_structure1.png"))
+png(file.path(prj_path, "img/5_blub_structure1.png"))
 
 ds |>
   tidyr::gather(variable, value, c(TY, blup)) |>
@@ -65,7 +65,7 @@ ds |>
 dev.off()
 
 
-png(file.path(prj_path, "img/blub_structure2.png"))
+png(file.path(prj_path, "img/5_blub_structure2.png"))
 
 ds |>
   dplyr::filter(TLID %in% sample(unique(ds$TLID), 12, replace = F)) |>
