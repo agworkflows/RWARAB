@@ -1,8 +1,9 @@
-
 ############## START SETUP
-prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
-################ SETUP END
+prj_path <- wow::init("RWA_potato", "agworkflows")
 
+
+## cannot run this because the data are not available.
+not_run <- function() {
 
 fraw <- file.path(prj_path, "raw/SAnDMan.RDS")
 if (!file.exists(fraw)) {
@@ -11,15 +12,15 @@ if (!file.exists(fraw)) {
 	user <- creds[1]
 	pw   <- creds[2]
 	#get the list of all datasets of user...
-	#dss <- agvise::findONAdata(user = user, pw = pw)
+	#dss <- workflow::findONAdata(user = user, pw = pw)
 	#download and decompose the assign field/trial/plot data:
 	id <- dss[dss$id_string == "Assign_FDTLPO",]$id
-	ad <- agvise::getONAdata(user = user, pw = pw, id = id) 
+	ad <- workflow::getONAdata(user = user, pw = pw, id = id) 
 	saveRDS(ad, fraw)
 } 
 
 ad <- readRDS(fraw)
-ad <- agvise::decomposeONAdata(ad)
+ad <- workflow::decomposeONAdata(ad)
 
 
 #get the field identifiers
@@ -56,3 +57,4 @@ ds1 <- pd[[3]] |> #plot level data
 outfile <- file.path(prj_path, "intermediate/SAnDMan_potato_fieldData.RDS"))
 saveRDS(ds1, outfile)
 
+}

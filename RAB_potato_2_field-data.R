@@ -1,7 +1,6 @@
-
 ############## START SETUP
-prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
-################ SETUP END
+prj_path <- wow::init("RWA_potato", "agworkflows")
+
 
 ### get the data
 # SAnDMan data (created with RAB_potato_1_ONA.R)
@@ -10,15 +9,16 @@ ds1 <- readRDS(file.path(prj_path, "data/intermediate/SAnDMan_potato_fieldData.R
 ### the data used in this script are are not public 
 ### you need to put these files in the "$rootdir$/RAB/data/raw" folder
 # RwaSIS season 1 data
+
 raw_path <- file.path(prj_path, "data/raw")
 ds2 <- readRDS(file.path(raw_path, "RwaSIS_potato_2022A_fieldData.RDS"))
 
-ds2 <- read.csv(file.path(raw_path, "rwasis-potato-fertiliser-all-data.csv"))
+#ds2 <- read.csv(file.path(raw_path, "rwasis-potato-fertiliser-all-data.csv"))
 
 # processed IFDC potato data
 #ds3 <- readRDS(file.path(raw_path, "IFDC_potato_2014B_fieldData.RDS"))
 ds3 <- read.csv(file.path(raw_path, "IFDC_Rwanda potato 2014B season data subset.csv"))
-ds3_nutrates <- read.csv(file.path(raw_path, "IFDC_Rwanda potato 2014B season treat nutrates.csv")
+ds3_nutrates <- read.csv(file.path(raw_path, "IFDC_Rwanda potato 2014B season treat nutrates.csv"))
 
 nut_rates <- read.csv(file.path(raw_path, "RwaSIS_potato_trials_nutrient_rates.csv"))
 phd <- read.csv(file.path(raw_path, "RwaSIS_potato_trials_with_yield_data_2023-04-14_RwaSIS_PFR.csv"))
@@ -26,8 +26,8 @@ phd <- read.csv(file.path(raw_path, "RwaSIS_potato_trials_with_yield_data_2023-0
 
 #correcting season entries
 ds1 <- ds1 |>
-  dplyr::mutate(season = dplyr::ifelse(season %in% c("2222B", "B2022", "2022b", "2020B", "2022"), "2022B", season),
-         season = dplyr::ifelse(season == "2020A", "2021A", season))
+  dplyr::mutate(season = ifelse(season %in% c("2222B", "B2022", "2022b", "2020B", "2022"), "2022B", season),
+         season = ifelse(season == "2020A", "2021A", season))
 
 #correcting plotsize and calculating yield
 ds1 <- ds1 |> 
@@ -37,12 +37,15 @@ ds1 <- ds1 |>
   dplyr::group_by(TLID2) |>
   dplyr::mutate(plotSize = median(plotSize)) |>
   dplyr::group_by(POID2) |>
-  dplyr::filter(start == max(start)) |> #only taking the last observation per POID
+  #only taking the last observation per POID
+  dplyr::filter(start == max(start)) |> 
   dplyr::mutate(n = dplyr::n()) |>
-  dplyr::filter(n == 1) |> #drop all plots that have more than one yield observation
+  #drop all plots that have more than one yield observation
+  dplyr::filter(n == 1) |> 
   dplyr::ungroup() |>
   dplyr::mutate(TY = ifelse(is.na(tubersFW), tubersMarketableFW, tubersFW)/plotSize*10,
-         TY = ifelse(POID2 == "SAPORW756633027058", TY/10, TY)) |> #correcting entry without decimal separator
+  #correcting entry without decimal separator
+		TY = ifelse(POID2 == "SAPORW756633027058", TY/10, TY)) |>
   dplyr::left_join(nut_rates) |>
   dplyr::rename(FDID = FDID2, TLID = TLID2) |>
   dplyr::select(expCode, FDID, TLID, lat, lon, season, plantingDate, harvestDate, treat, N, P, K, TY) |>
@@ -90,14 +93,14 @@ ds2 <- ds2 |>
 #####################################
 
 ds3 <- ds3 |>
-  dplyr::gather(treat, TY, control:all_redK) |>
+  tidyr::gather(treat, TY, control:all_redK) |>
   dplyr::mutate(season = "2014B",
          expCode = "IFDC",
          FDID = paste0("IFDC_", siteNr),
          TLID = FDID, 
          plantingDate = NA,
          harvestDate = NA) |>
-  dplyr::join(ds3_nutrates) |>
+  dplyr::left_join(ds3_nutrates) |>
   dplyr:: select(expCode, FDID, TLID, lat, lon, season, plantingDate, harvestDate, treat, N, P, K, TY)
 
 ds3[ds3$TLID == "IFDC_3",]$lon <- ds3[ds3$TLID == "IFDC_3",]$lon - 1 #wrong GPS entry 
@@ -106,5 +109,5 @@ ds3[ds3$TLID == "IFDC_3",]$lon <- ds3[ds3$TLID == "IFDC_3",]$lon - 1 #wrong GPS 
 ### 4. Combining all datasets ###
 
 ds <- rbind(ds1, ds2, ds3)
-saveRDS(ds, file.path(uc_path, "intermediate/compiled_potato_fertiliser_trial_data.RDS"))
+saveRDS(ds, file.path(prj_path, "data/intermediate/compiled_potato_fertiliser_trial_data.RDS"))
 

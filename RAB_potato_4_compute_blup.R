@@ -1,7 +1,7 @@
 
 ############## START SETUP
-prj_path <- agvise::setup_project("RWA_potato", "agworkflows")
-################ SETUP END
+prj_path <- wow::init("RWA_potato", "agworkflows")
+
 
 #########################################
 # 4. Fit lmer to eliminate random error #
