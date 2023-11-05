@@ -9,7 +9,7 @@ library(ggplot2)
 
 png(file.path(prj_path, "img/8_rev_randomforest.png"))
 
-py |> dplyr::left_join(ds |> dplyr::select(TLID, expCode, season) |> unique()) |>
+py |> dplyr::left_join(ds |> dplyr::select(TLID, expCode, season) |> unique(), by="TLID") |>
   #filter(Nlim == "limiting", Plim == "non-limiting" & Klim == "non-limiting") |>
   dplyr::mutate(refY = ifelse(N > 75 & P > 30 & K > 50, "Reference treatment", "Other treatments")) |>
   ggplot(aes(x = Yp, y = Yb)) + 

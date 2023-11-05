@@ -14,7 +14,7 @@ pINS <- INS |>
          nutrient = factor(nutrient, levels = c("N", "P", "K")),
          variable = ifelse(grepl("pred", variable), "RandomForest", "revQUEFTS")) |>
   tidyr::spread(variable, value) |>
-  dplyr::left_join(ds |> dplyr::select(TLID, expCode, season) |> unique()) |>
+  dplyr::left_join(ds |> dplyr::select(TLID, expCode, season) |> unique(), by="TLID") |>
   dplyr::mutate(season = ifelse(grepl("A", season), "A", "B")) |>
   #mutate(RandomForest = ifelse(nutrient == "N" & RandomForest >= 120, NA, 
   #                             ifelse(nutrient == "P"& RandomForest >= 30, NA,

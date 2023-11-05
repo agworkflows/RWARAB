@@ -2,7 +2,6 @@
 prj_path <- wow::init("RWA_potato", "agworkflows")
 
 
-
 ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
 
 #plot showing relationship between observations (with random error) and BLUPs (without random error)
@@ -16,6 +15,7 @@ base_plot <- function() {
 #base_plot()
 
 library(ggplot2)
+suppressMessages(library(ggpmisc))
 
 png(file.path(prj_path, "img/5_blub_vs_raw.png"))
 
@@ -30,7 +30,7 @@ png(file.path(prj_path, "img/5_blub_vs_raw.png"))
 	  theme_gray()+
 	  theme(axis.title = element_text(size = 14, face="bold"),
 			axis.text = element_text(size = 14))
-}
+
 dev.off()
 
 #plot illustrating that the elimination of random error results in more meaningful structure in yield response:

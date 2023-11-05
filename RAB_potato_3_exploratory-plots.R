@@ -1,4 +1,3 @@
-
 ### SETUP
 prj_path <- wow::init("RWA_potato", "agworkflows")
 
@@ -40,10 +39,10 @@ dev.off()
 
 #map with trial locations:
 
-rwa0 <- geodata::gadm("RWA", level=0) |> sf::st_as_sf()
-rwa1 <- geodata::gadm("RWA", level=1) |> sf::st_as_sf()
-rwa2 <- geodata::gadm("RWA", level=2) |> sf::st_as_sf()
-#rwa3 <- geodata::gadm("RWA", level=3) |> sf::st_as_sf()
+rwa0 <- geodata::gadm("RWA", level=0, path=prj_path) |> sf::st_as_sf()
+rwa1 <- geodata::gadm("RWA", level=1, path=prj_path) |> sf::st_as_sf()
+rwa2 <- geodata::gadm("RWA", level=2, path=prj_path) |> sf::st_as_sf()
+#rwa3 <- geodata::gadm("RWA", level=3, path=prj_path) |> sf::st_as_sf()
 
 rwa1$ENAME_1 <- sapply(strsplit(rwa1$VARNAME_1, "\\|"), \(i)i[1])
 rwa2 <- merge(rwa2, data.frame(rwa1)[, c("NAME_1", "ENAME_1")], by="NAME_1")
@@ -64,7 +63,7 @@ png(file.path(prj_path, "img/3_explore_trial_locations.png"))
 	  geom_sf(data = rwa2, linewidth = 0.6, color = "grey", fill=NA) +
 	  geom_sf(data = rwa1, linewidth = 0.8, color = "black", fill=NA) + 
 	  geom_sf(data = rwa0, linewidth = 1.2, color = "black", fill=NA) + 
-		geom_sf_text(data = rwshp2[rwshp2$ENAME_1 %in% c("Northern Province", "Western Province", "Southern Province"),], aes(label = NAME_2))+
+		geom_sf_text(data = rwa2[rwa2$ENAME_1 %in% c("Northern Province", "Western Province", "Southern Province"),], aes(label = NAME_2))+
 	  geom_point(data = ds, aes(x=as.numeric(lon), y=as.numeric(lat), shape = expCode, colour = expCode, size = expCode))+
 	  scale_shape_manual(values = c(15, 16, 18))+
 	  scale_size_manual(values = c(3,3,4))+

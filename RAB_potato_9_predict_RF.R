@@ -70,9 +70,9 @@ predRFs <- do.call(rbind, predRFs)
 saveRDS(predRFs, file.path(prj_path, "/data/intermediate/predRFs.RDS"))
 
 dsp <- ds |>
-  plyr::join(sdt) |>
-  plyr::join(ds_ref) |>
-  plyr::join(tdt) |>
+  plyr::join(sdt, by="TLID") |>
+  plyr::join(ds_ref, by=c("TLID", "expCode")) |>
+  plyr::join(tdt, by="TLID") |>
   dplyr::select(-c(expCode, FDID, lat, lon, season, plantingDate, harvestDate, treat, N100:K100, TY))
 
 

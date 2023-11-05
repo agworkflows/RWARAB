@@ -46,7 +46,7 @@ ds1 <- ds1 |>
   dplyr::mutate(TY = ifelse(is.na(tubersFW), tubersMarketableFW, tubersFW)/plotSize*10,
   #correcting entry without decimal separator
 		TY = ifelse(POID2 == "SAPORW756633027058", TY/10, TY)) |>
-  dplyr::left_join(nut_rates) |>
+  dplyr::left_join(nut_rates, by="treat") |>
   dplyr::rename(FDID = FDID2, TLID = TLID2) |>
   dplyr::select(expCode, FDID, TLID, lat, lon, season, plantingDate, harvestDate, treat, N, P, K, TY) |>
   as.data.frame()
@@ -58,7 +58,7 @@ phd <- phd |>
   dplyr::rename(FDID = FDID2, TLID = TLID2) |>
   dplyr::select(FDID, TLID, plantingDate_FB, harvestDate_FB)
   
-ds1 <- ds1 |> dplyr::left_join(phd) |>
+ds1 <- ds1 |> dplyr::left_join(phd, by=c("FDID", "TLID")) |>
   dplyr::mutate(plantingDate = dplyr::if_else(is.na(plantingDate_FB), plantingDate, plantingDate_FB),
          harvestDate = dplyr::if_else(is.na(harvestDate_FB), harvestDate, harvestDate_FB)) |>
   dplyr::select(-c(plantingDate_FB, harvestDate_FB)) |>
@@ -100,7 +100,7 @@ ds3 <- ds3 |>
          TLID = FDID, 
          plantingDate = NA,
          harvestDate = NA) |>
-  dplyr::left_join(ds3_nutrates) |>
+  dplyr::left_join(ds3_nutrates, by="treat") |>
   dplyr:: select(expCode, FDID, TLID, lat, lon, season, plantingDate, harvestDate, treat, N, P, K, TY)
 
 ds3[ds3$TLID == "IFDC_3",]$lon <- ds3[ds3$TLID == "IFDC_3",]$lon - 1 #wrong GPS entry 

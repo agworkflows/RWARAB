@@ -23,6 +23,6 @@ workflow::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
 workflow::install_pkgs("Rquefts", update=TRUE)
 
 #set the default geodata path
-#geodata::geodata_path(geodata_dir)
+geodata::geodata_path(geodata_dir)
 
 

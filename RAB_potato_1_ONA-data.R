@@ -54,7 +54,7 @@ ds1 <- pd[[3]] |> #plot level data
   left_join(af) |>
   left_join(at)
 
-outfile <- file.path(prj_path, "intermediate/SAnDMan_potato_fieldData.RDS"))
+outfile <- file.path(prj_path, "intermediate/SAnDMan_potato_fieldData.RDS")
 saveRDS(ds1, outfile)
 
 }

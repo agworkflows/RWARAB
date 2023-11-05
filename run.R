@@ -1,9 +1,13 @@
 RAB_potato_1_ONA-data.R
 RAB_potato_2_field-data.R
 RAB_potato_3_exploratory-plots.R
-RAB_potato_4_compute_blub.R
-RAB_potato_5_blub-plots.R
+RAB_potato_4_compute_blup.R
+RAB_potato_5_blup-plots.R
 RAB_potato_6_reverse-quefts.R
+RAB_potato_6_reverse-quefts_plots.R
 RAB_potato_7_predict_soil-supply.R
+RAB_potato_7_predict_soil-supply_plots.R
 RAB_potato_8_predict_QFTS.R
+RAB_potato_8_predict_QFTS_plots.R
 RAB_potato_9_predict_RF.R
+RAB_potato_9_predict_RF_plots.R

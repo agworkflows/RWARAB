@@ -59,7 +59,7 @@ tdt <- tdt |>
 
 INS <- supply |>
   #adding lats and lons and data source:
-  dplyr::left_join(ds |> dplyr::select(TLID, lat, lon, expCode, season) |> unique()) |>
+  dplyr::left_join(ds |> dplyr::select(TLID, lat, lon, expCode, season) |> unique(), by="TLID") |>
   dplyr::mutate(lat = as.numeric(lat),
          lon = as.numeric(lon)) |>
   #setting negative values to zero and maximal values to 750:
@@ -75,9 +75,9 @@ INS <- supply |>
 
 #Add predictors to INS dataset:
 INS <- INS |> 
-  dplyr::left_join(sdt) |>
-  dplyr::left_join(ds_ref) |>
-  dplyr::left_join(tdt) |>
+  dplyr::left_join(sdt, by="TLID") |>
+  dplyr::left_join(ds_ref, by=c("TLID", "expCode")) |>
+  dplyr::left_join(tdt, by="TLID") |>
   na.omit()
 
 #INS$P_base_supply_bin <- as.factor(ifelse(INS$P_base_supply < 50, "limiting", "non-limiting"))
@@ -140,7 +140,7 @@ preds <- do.call(rbind, prd)
 
 saveRDS(preds, file.path(prj_path, "data/intermediate/LOOCV_predictions_NPK_base_supply_afterlmer.RDS"))
 
-INS <- INS |> dplyr::left_join(preds)
+INS <- INS |> dplyr::left_join(preds, by="TLID")
 saveRDS(INS, file.path(prj_path, "data/intermediate/INS.RDS"))
 
 

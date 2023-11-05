@@ -1,16 +1,15 @@
 ### SETUP
 prj_path <- wow::init("RWA_potato", "agworkflows")
 
-
 ds <- readRDS(file.path(prj_path, "/data/intermediate/potato_fertiliser_trial_data_blup.RDS"))
 #converting to kg DM/ha, assuming 79% moisture content
 ds$Y <- ds$blup * 1000 * 0.21
 
-supply <- readRDS(file.path(prj_path, "data/intermediate/compiled_potato_fertiliser_trial_calculated_supply_afterlmer_sqrttf.RDS")
+supply <- readRDS(file.path(prj_path, "data/intermediate/compiled_potato_fertiliser_trial_calculated_supply_afterlmer_sqrttf.RDS"))
 
 INS <- supply |>
   #adding lats and lons and data source:
-  dplyr::left_join(ds |> dplyr::select(TLID, lat, lon, expCode, season) |> unique()) |>
+  dplyr::left_join(ds |> dplyr::select(TLID, lat, lon, expCode, season) |> unique(), by="TLID") |>
   dplyr::mutate(lat = as.numeric(lat),
          lon = as.numeric(lon)) |>
   #setting negative values to zero and maximal values to 750:
@@ -28,12 +27,12 @@ INS <- supply |>
 
 library(ggplot2)
 
-png(file.path(prj_path, "img/rev_quefts.png"))
+png(file.path(prj_path, "img/6_rev_quefts.png"))
 
 INS |>
   tidyr::gather(variable, value, N_base_supply:K_base_supply) |>
   dplyr::mutate(variable = factor(variable, levels = c("N_base_supply", "P_base_supply", "K_base_supply")),
-         variable = revalue(variable, c("N_base_supply" = "N",
+         variable = plyr::revalue(variable, c("N_base_supply" = "N",
                                         "P_base_supply" = "P",
                                         "K_base_supply" = "K")),
          season = ifelse(grepl("A", season), "A", "B")) |>
