@@ -8,9 +8,8 @@ if (system('hostname', TRUE) == "LAPTOP-IVSPBGCA") {
 	rootdir <- "c:/workspace/agwise"
 	geodata_dir <- rootdir
 } else { 
-	# cglabs
-	rootdir <- "~/agwise"
-	geodata_dir <- rootdir
+	rootdir <- "."
+	geodata_dir <- "."
 }
 
 project <- "RWA_potato"
@@ -19,8 +18,8 @@ project <- "RWA_potato"
 prj_path <- file.path(rootdir, project)
 
 #make sure required packages are installed
-workflow::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
-workflow::install_pkgs("Rquefts", update=TRUE)
+wow::install_pkgs(c("geodata", "ranger", "randomForest", "lme4", "dplyr"))
+wow::install_pkgs("Rquefts", update=TRUE)
 
 #set the default geodata path
 geodata::geodata_path(geodata_dir)

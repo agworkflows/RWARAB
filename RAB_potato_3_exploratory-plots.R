@@ -39,9 +39,10 @@ dev.off()
 
 #map with trial locations:
 
-rwa0 <- geodata::gadm("RWA", level=0, path=prj_path) |> sf::st_as_sf()
-rwa1 <- geodata::gadm("RWA", level=1, path=prj_path) |> sf::st_as_sf()
-rwa2 <- geodata::gadm("RWA", level=2, path=prj_path) |> sf::st_as_sf()
+gpath <- file.path(prj_path, "data", "raw")
+rwa0 <- geodata::gadm("RWA", level=0, path=gpath) |> sf::st_as_sf()
+rwa1 <- geodata::gadm("RWA", level=1, path=gpath) |> sf::st_as_sf()
+rwa2 <- geodata::gadm("RWA", level=2, path=gpath) |> sf::st_as_sf()
 #rwa3 <- geodata::gadm("RWA", level=3, path=prj_path) |> sf::st_as_sf()
 
 rwa1$ENAME_1 <- sapply(strsplit(rwa1$VARNAME_1, "\\|"), \(i)i[1])

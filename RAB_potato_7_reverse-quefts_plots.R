@@ -25,10 +25,10 @@ INS <- supply |>
 
 #Create plot to demonstrate ranges in supply by expCode and season combinations:
 
-library(ggplot2)
 
 png(file.path(prj_path, "img/6_rev_quefts.png"))
 
+library(ggplot2)
 INS |>
   tidyr::gather(variable, value, N_base_supply:K_base_supply) |>
   dplyr::mutate(variable = factor(variable, levels = c("N_base_supply", "P_base_supply", "K_base_supply")),
